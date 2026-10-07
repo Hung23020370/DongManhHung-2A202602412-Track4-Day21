@@ -26,11 +26,19 @@ Sẽ đo: % điểm của xe nằm ngoài 2D box, theo yaw 0°, 0.5°, 1°, 2°,
 
 Bảng hoặc plot số liệu, kèm ảnh/video demo. Ghi rõ đường dẫn file trong `results/`.
 
-| Cấu hình / mức perturb | Metric 1 | Metric 2 | Ghi chú |
-|---|---|---|---|
-| [ĐIỀN] | | | |
+Metric: **% điểm của xe (trong 3D box GT) chiếu ra ngoài 2D box GT**, trung bình trên xe, gộp yaw +/−. Yaw 0° cho 0.0% ở cả 3 nhóm (calibration gốc khớp). 30 xe `Car` (truncated = 0, occluded = 0, ≥ 10 điểm) từ 20 frame kitti_mini.
 
-![demo](../results/figures/[ĐIỀN].png)
+| Nhóm khoảng cách (số xe) | yaw 0.5° | yaw 1° | yaw 2° | yaw 3° |
+|---|---|---|---|---|
+| < 15 m (9) | 0.1 | **1.6** | 7.7 | 14.7 |
+| 15–30 m (10) | 4.5 | **14.7** | 37.9 | 61.7 |
+| ≥ 30 m (11) | 10.3 | **28.9** | 71.5 | 93.3 |
+
+![demo](../results/figures/yaw_sweep_outside_pct.png)
+
+Ảnh overlay baseline ở 3 khoảng cách: `results/figures/cp2_overlay_3_distances.png`. Số liệu: `results/yaw_perturb_sweep.csv` (tổng hợp), `results/yaw_perturb_per_object.csv` (từng xe), cấu hình: `results/yaw_perturb_config.json`.
+
+**Kết luận:** claim được ủng hộ. Ở yaw 1°, 11/11 xe ≥ 30 m có hơn 10% điểm rơi ngoài box (thấp nhất 13.1%, trung vị 30.0%), và trung bình xe ≥ 30 m gấp khoảng 18 lần xe < 15 m (28.9% so với 1.6%). Dự đoán hình học ban đầu (≈ d·sin 1° / bề rộng xe) đúng về xu hướng nhưng **quá cao cho xe gần** (dự đoán ~10%, đo được 1.6%): dịch 12.6 px là nhỏ so với box rộng ~195 px của xe gần, nên chỉ điểm sát mép bị đẩy ra. Lưu ý: 3 xe ở ≥ 60 m bị loại vì có dưới 10 điểm trong 3D box; lệch +1° và −1° không đối xứng hoàn toàn (14.9% và 17.0% trên toàn bộ xe).
 
 ## 3. Failure case
 
@@ -53,6 +61,8 @@ Các lệnh tái tạo lại toàn bộ kết quả từ repo sạch.
 ```bash
 # CP2: test tay + ảnh overlay 3 khoảng cách (gần/vừa/xa)
 python -m src.cp2_demo
+# CP3: sweep yaw (xác định, không ngẫu nhiên) -> results/yaw_perturb_*.csv + figures/yaw_sweep_outside_pct.png
+python -m src.yaw_sweep
 # Overlay đầy đủ từng frame bằng CLI của starter
 python -m starter.projection --data-root data/kitti_mini --frame 000025
 python -m starter.projection --data-root data/kitti_mini --frame 000011
