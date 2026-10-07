@@ -51,7 +51,12 @@ Use-case cụ thể (ADAS / robot / drone), trade-off và bước tiếp theo.
 Các lệnh tái tạo lại toàn bộ kết quả từ repo sạch.
 
 ```bash
-[ĐIỀN]
+# CP2: test tay + ảnh overlay 3 khoảng cách (gần/vừa/xa)
+python -m src.cp2_demo
+# Overlay đầy đủ từng frame bằng CLI của starter
+python -m starter.projection --data-root data/kitti_mini --frame 000025
+python -m starter.projection --data-root data/kitti_mini --frame 000011
+python -m starter.projection --data-root data/kitti_mini --frame 000007
 ```
 
 ## 6. Khai báo sử dụng AI
